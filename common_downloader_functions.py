@@ -12,12 +12,12 @@ from rich import print
 from config import DEBUG_MODE
 
 
-def download_image_to_raw(url: str) -> requests.Response | None:
+def download_url_to_raw(url: str) -> requests.Response | None:
     """
-    Downloads an image from the given `URL` and returns the response object. Handles HTTP errors for access denial and rate limiting.
+    Downloads from the given `URL` and returns the response object. Handles HTTP errors for access denial and rate limiting.
 
-    :param url: The URL of the image to download.
-    :return: The content of the image in bytes as a requests.Response object, or `None` if access is denied (HTTP 403), if rate limited and retry fails (HTTP 429), or for other unhandled HTTP errors.
+    :param url: The URL to download.
+    :return: The content in bytes as a requests.Response object, or `None` if access is denied (HTTP 403), if rate limited and retry fails (HTTP 429), or for other unhandled HTTP errors.
     """
     max_retries = 5
     retries = 0
@@ -52,25 +52,25 @@ def download_image_to_raw(url: str) -> requests.Response | None:
     return None
 
 
-def download_image_to_bytes(url: str) -> bytes | None:
+def download_url_to_bytes(url: str) -> bytes | None:
     """
-    Downloads an image from the given `URL` and returns its content as bytes. Handles HTTP errors for access denial and rate limiting.
+    Downloads from the given `URL` and returns its content as bytes. Handles HTTP errors for access denial and rate limiting.
 
-    :param url: The URL of the image to download.
-    :return: The content of the image in bytes. Returns `None` if access is denied (HTTP 403).
+    :param url: The URL to download.
+    :return: The content in bytes. Returns `None` if access is denied (HTTP 403).
     """
-    response = download_image_to_raw(url)
+    response = download_url_to_raw(url)
     return response.content if response else None
 
 
-def download_image_to_json(url: str) -> dict[str, str | list[str]] | None:
+def download_url_to_json(url: str) -> dict | None:
     """
-    Downloads an image from the given `URL` and returns its content as JSON. Handles HTTP errors for access denial and rate limiting.
+    Downloads from the given `URL` and returns its content as JSON. Handles HTTP errors for access denial and rate limiting.
 
-    :param url: The URL of the image to download.
-    :return: The content of the image in JSON format. Returns `None` if access is denied (HTTP 403).
+    :param url: The URL to download.
+    :return: The content in JSON format. Returns `None` if access is denied (HTTP 403).
     """
-    response = download_image_to_raw(url)
+    response = download_url_to_raw(url)
     return response.json() if response else None
 
 

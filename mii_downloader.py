@@ -8,7 +8,7 @@ from pathlib import Path
 from rich import print
 from rich.progress import Progress, TaskID, SpinnerColumn, TextColumn, MofNCompleteColumn, BarColumn, TaskProgressColumn
 
-from common_downloader_functions import download_image_to_bytes, render_gif_from_frames, find_next_available_file_path, save_contents_to_file
+from common_downloader_functions import download_url_to_bytes, render_gif_from_frames, find_next_available_file_path, save_contents_to_file
 from config import (
     MIIS_NINTENDO_ACCOUNT,
     MIIS_MII_STUDIO,
@@ -75,7 +75,7 @@ def process_image(progress: Progress, task: TaskID, mii: dict[str, str], pose: s
     url = generate_url(mii, pose, expression, frames, shading)
     if DEBUG_MODE:
         print(f"[blue]Loading[/]: {url}")
-    image_content = download_image_to_bytes(url)
+    image_content = download_url_to_bytes(url)
     if image_content is None:
         print(f"[red]Error[/]: Failed to download image from {url}.")
         return

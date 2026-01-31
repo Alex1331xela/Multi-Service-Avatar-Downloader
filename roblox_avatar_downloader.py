@@ -10,7 +10,7 @@ from rich import print
 from rich.progress import Progress, TaskID, SpinnerColumn, TextColumn, MofNCompleteColumn, BarColumn, TaskProgressColumn
 
 
-from common_downloader_functions import download_image_to_bytes, download_image_to_json, find_next_available_file_path, save_contents_to_file
+from common_downloader_functions import download_url_to_bytes, download_url_to_json, find_next_available_file_path, save_contents_to_file
 from config import ROBLOX_USER_IDS, ROBLOX_POSES, ROBLOX_DOWNLOAD_FOLDER, ROBLOX_SAVE_OUTFIT_IMAGES, ROBLOX_AVATAR_LINK_TEMPLATE, ROBLOX_CURRENT_OUTFIT_TEMPLATE, ROBLOX_OUTFIT_LINK_TEMPLATE
 
 
@@ -33,7 +33,7 @@ def download_roblox_avatars_and_outfits(progress: Progress) -> None:
         for pose in ROBLOX_POSES:
             download_roblox_avatars(progress, task_downloading_avatars, user, pose)
     if ROBLOX_SAVE_OUTFIT_IMAGES and all_asset_ids:
-        download_roblox_outfits(progress, task_downloading_outfits, user, all_asset_ids)
+        download_roblox_outfits(progress, task_downloading_outfits, all_asset_ids)
 
 
 def load_outfit_asset_ids(progress: Progress, task: TaskID) -> list[str]:
@@ -69,7 +69,7 @@ def get_outfit_asset_ids(current_outfit_url: str) -> list[str] | None:
     :return: A list of outfit asset IDs if available, otherwise `None`.
     """
     try:
-        data = download_image_to_json(current_outfit_url)
+        data = download_url_to_json(current_outfit_url)
         if isinstance(data, dict) and "assetIds" in data and isinstance(data["assetIds"], list):
             return data["assetIds"]
     except Exception as error:
@@ -100,15 +100,17 @@ def download_roblox_avatars(progress: Progress, task: TaskID, user: dict[str, st
     image_url = get_image_url_from_roblox_api(api_url)
     filename = f"roblox_{user['user_id']}_{pose['pose']}.png"
     if image_url:
-        image_content = download_image_to_bytes(image_url)
+        image_content = download_url_to_bytes(image_url)
         if image_content is None:
-            print(f"[red]Error[/]: Failed to download [blue]{user['username']}[/] ([blue]{user['user_id']}[/])'s [blue]{pose["pose"]}[/] image from {image_url}.")
+            print(f"[red]Error[/]: Failed to download [blue]{pose["pose"]}[/] image for user [blue]{user['username']}[/] of ID [blue]{user['user_id']}[/]) from {image_url}")
             progress.update(task, advance=1)
             return
         result = find_next_available_file_path(ROBLOX_DOWNLOAD_FOLDER, filename, image_content, suffix_on_original_file_and_take_its_spot=True)
         if result:
             save_contents_to_file(result, image_content)
         progress.update(task, advance=1)
+    else:
+        print(f"[red]Error[/]: No URL found for [blue]{pose["pose"]}[/] image for user [blue]{user['username']}[/] of ID [blue]{user['user_id']}[/] from {image_url}")
 
 
 def get_image_url_from_roblox_api(api_url: str) -> str | None:
@@ -119,10 +121,8 @@ def get_image_url_from_roblox_api(api_url: str) -> str | None:
     :return: The avatar image URL if available, otherwise `None`.
     """
     try:
-        response = requests.get(api_url, timeout=10)
-        response.raise_for_status()
-        data_json = response.json()
-        if "data" in data_json and data_json["data"]:
+        data_json = download_url_to_json(api_url)
+        if data_json and "data" in data_json and data_json["data"]:
             entry = data_json["data"][0]
             if entry.get("state") == "Completed" and "imageUrl" in entry:
                 return entry["imageUrl"]
@@ -134,7 +134,7 @@ def get_image_url_from_roblox_api(api_url: str) -> str | None:
         print(f"[red]Error[/]: Problem fetching {api_url}: {error}")
 
 
-def download_roblox_outfits(progress: Progress, task: TaskID, user: dict[str, str], all_asset_ids: list[str]) -> None:
+def download_roblox_outfits(progress: Progress, task: TaskID, all_asset_ids: list[str]) -> None:
     """
     Downloads Roblox outfit images based on the specified parameters.
 
@@ -148,9 +148,9 @@ def download_roblox_outfits(progress: Progress, task: TaskID, user: dict[str, st
         file_name = f"roblox_outfit_{outfit_type}_{outfit_id}.png"
         folder_path.mkdir(parents=True, exist_ok=True)
         if image_url:
-            image_content = download_image_to_bytes(image_url)
+            image_content = download_url_to_bytes(image_url)
             if image_content is None:
-                print(f"[red]Error[/]: Failed to download [purple]{user['username']}[/] ([purple]{user['user_id']}[/])'s image from {image_url}.")
+                print(f"[red]Error[/]: Failed to download image for outfit type [blue]{outfit_type}[/] of ID [blue]{outfit_id}[/] from {image_url}")
                 progress.update(task, advance=1)
                 return
             result = find_next_available_file_path(folder_path, file_name, image_content, suffix_on_original_file_and_take_its_spot=True)
@@ -158,7 +158,7 @@ def download_roblox_outfits(progress: Progress, task: TaskID, user: dict[str, st
                 save_contents_to_file(result, image_content)
             progress.update(task, advance=1)
         else:
-            print(f"[red]Error[/]: No outfit found for [purple]{user['username']}[/] ([purple]{user['user_id']}[/]) at {image_url}")
+            print(f"[red]Error[/]: No URL found for outfit type [blue]{outfit_type}[/] of ID [blue]{outfit_id}[/] from {image_url}")
 
 
 if __name__ == "__main__":
