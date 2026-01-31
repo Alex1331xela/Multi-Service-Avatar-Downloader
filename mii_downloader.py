@@ -10,6 +10,7 @@ from rich.progress import Progress, TaskID, SpinnerColumn, TextColumn, MofNCompl
 
 from common_downloader_functions import download_url_to_bytes, render_gif_from_frames, find_next_available_file_path, save_contents_to_file
 from config import (
+    DEBUG_MODE,
     MIIS_NINTENDO_ACCOUNT,
     MIIS_MII_STUDIO,
     MIIS_NINTENDO_NETWORK_ID,
@@ -22,7 +23,6 @@ from config import (
     LINK_TEMPLATE_NINTENDO_ACCOUNT,
     LINK_TEMPLATE_MII_STUDIO,
     LINK_TEMPLATE_MII_RENDERER_REAL,
-    DEBUG_MODE,
 )
 
 

@@ -5,13 +5,21 @@ sys.dont_write_bytecode = True
 import time
 from pathlib import Path
 
-import requests
 from rich import print
 from rich.progress import Progress, TaskID, SpinnerColumn, TextColumn, MofNCompleteColumn, BarColumn, TaskProgressColumn
 
 
 from common_downloader_functions import download_url_to_bytes, download_url_to_json, find_next_available_file_path, save_contents_to_file
-from config import ROBLOX_USER_IDS, ROBLOX_POSES, ROBLOX_DOWNLOAD_FOLDER, ROBLOX_SAVE_OUTFIT_IMAGES, ROBLOX_AVATAR_LINK_TEMPLATE, ROBLOX_CURRENT_OUTFIT_TEMPLATE, ROBLOX_OUTFIT_LINK_TEMPLATE
+from config import (
+    DEBUG_MODE,
+    ROBLOX_USER_IDS,
+    ROBLOX_POSES,
+    ROBLOX_DOWNLOAD_FOLDER,
+    ROBLOX_SAVE_OUTFIT_IMAGES,
+    ROBLOX_AVATAR_LINK_TEMPLATE,
+    ROBLOX_CURRENT_OUTFIT_TEMPLATE,
+    ROBLOX_OUTFIT_LINK_TEMPLATE,
+)
 
 
 def download_roblox_avatars_and_outfits(progress: Progress) -> None:
@@ -47,7 +55,7 @@ def load_outfit_asset_ids(progress: Progress, task: TaskID) -> list[str]:
         current_outfit_url = ROBLOX_CURRENT_OUTFIT_TEMPLATE.format(user_id=user["user_id"])
         asset_ids = get_outfit_asset_ids(current_outfit_url)
         if not asset_ids:
-            print(f"[red]Error[/]: No outfit asset IDs found for [purple]{user['username']}[/] ([purple]{user['user_id']}[/]) at {current_outfit_url}")
+            print(f"[red]Error[/]: No outfit asset IDs found for [blue]{user['username']}[/] ([blue]{user['user_id']}[/]) at {current_outfit_url}")
             continue
         all_asset_ids.append({user["user_id"]: asset_ids})
         progress.update(task, advance=1)
@@ -127,7 +135,8 @@ def get_image_url_from_roblox_api(api_url: str) -> str | None:
             if entry.get("state") == "Completed" and "imageUrl" in entry:
                 return entry["imageUrl"]
             elif entry.get("state") == "Pending":
-                print(f"[yellow]Warning[/]: Image generation pending for {api_url}.")
+                if DEBUG_MODE:
+                    print(f"[yellow]Warning[/]: Image generation pending for {api_url}")
                 time.sleep(5)
                 return get_image_url_from_roblox_api(api_url)
     except Exception as error:
