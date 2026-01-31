@@ -41,7 +41,8 @@ def download_roblox_avatars_and_outfits(progress: Progress) -> None:
         for pose in ROBLOX_POSES:
             download_roblox_avatars(progress, task_downloading_avatars, user, pose)
     if ROBLOX_SAVE_OUTFIT_IMAGES and all_asset_ids:
-        download_roblox_outfits(progress, task_downloading_outfits, all_asset_ids)
+        for outfit_id in all_asset_ids:
+            download_roblox_outfits(progress, task_downloading_outfits, outfit_id)
 
 
 def load_outfit_asset_ids(progress: Progress, task: TaskID) -> list[str]:
@@ -120,7 +121,7 @@ def download_roblox_avatars(progress: Progress, task: TaskID, user: dict[str, st
         return
 
     filename = f"roblox_{user['user_id']}_{pose['pose']}.png"
-    file_path = find_next_available_file_path(ROBLOX_DOWNLOAD_FOLDER, filename, image_content, suffix_on_original_file_and_take_its_spot=True)
+    file_path = find_next_available_file_path(ROBLOX_DOWNLOAD_FOLDER, filename, image_content)
     if file_path:
         save_contents_to_file(file_path, image_content)
     progress.update(task, advance=1)
@@ -148,35 +149,34 @@ def get_image_url_from_roblox_api(api_url: str) -> str | None:
         print(f"[red]Error[/]: Problem fetching {api_url}: {error}")
 
 
-def download_roblox_outfits(progress: Progress, task: TaskID, all_asset_ids: list[str]) -> None:
+def download_roblox_outfits(progress: Progress, task: TaskID, outfit_id: str) -> None:
     """
     Downloads Roblox outfit images based on the specified parameters.
 
-    :param user: A dictionary containing user information, including `user_id`.
+    :param outfit_id: A string containing the outfit ID to download.
     """
-    for outfit_id in all_asset_ids:
-        api_url = ROBLOX_OUTFIT_LINK_TEMPLATE.format(outfit_id=outfit_id)
-        image_url = get_image_url_from_roblox_api(api_url)
-        if not image_url:
-            print(f"[red]Error[/]: Failed to get image URL from API for outfit type [blue]{outfit_type}[/] of ID [blue]{outfit_id}[/] from {image_url}")
-            progress.update(task, advance=1)
-            return
-        if DEBUG_MODE:
-            print(f"[blue]Loading[/]: {image_url}")
-
-        image_content = download_url_to_bytes(image_url)
-        if image_content is None:
-            print(f"[red]Error[/]: Failed to download image for outfit type [blue]{outfit_type}[/] of ID [blue]{outfit_id}[/] from {image_url}")
-            progress.update(task, advance=1)
-            return
-
-        outfit_type = image_url.split("/")[-3] if image_url else "unknown"
-        file_name = f"roblox_outfit_{outfit_type}_{outfit_id}.png"
-        folder_path = Path(ROBLOX_DOWNLOAD_FOLDER, "outfits")
-        file_path = find_next_available_file_path(folder_path, file_name, image_content, suffix_on_original_file_and_take_its_spot=True)
-        if file_path:
-            save_contents_to_file(file_path, image_content)
+    api_url = ROBLOX_OUTFIT_LINK_TEMPLATE.format(outfit_id=outfit_id)
+    image_url = get_image_url_from_roblox_api(api_url)
+    if not image_url:
+        print(f"[red]Error[/]: Failed to get image URL from API for ID [blue]{outfit_id}[/] from {image_url}")
         progress.update(task, advance=1)
+        return
+    if DEBUG_MODE:
+        print(f"[blue]Loading[/]: {image_url}")
+
+    outfit_type = image_url.split("/")[-3]
+    image_content = download_url_to_bytes(image_url)
+    if image_content is None:
+        print(f"[red]Error[/]: Failed to download image for outfit type [blue]{outfit_type}[/] of ID [blue]{outfit_id}[/] from {image_url}")
+        progress.update(task, advance=1)
+        return
+
+    file_name = f"roblox_outfit_{outfit_type}_{outfit_id}.png"
+    folder_path = Path(ROBLOX_DOWNLOAD_FOLDER, "outfits")
+    file_path = find_next_available_file_path(folder_path, file_name, image_content)
+    if file_path:
+        save_contents_to_file(file_path, image_content)
+    progress.update(task, advance=1)
 
 
 if __name__ == "__main__":
