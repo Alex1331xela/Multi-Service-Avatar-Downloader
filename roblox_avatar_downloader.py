@@ -106,19 +106,24 @@ def download_roblox_avatars(progress: Progress, task: TaskID, user: dict[str, st
     """
     api_url = ROBLOX_AVATAR_LINK_TEMPLATE.format(user_id=user["user_id"], pose=pose["pose"], size=pose["size"])
     image_url = get_image_url_from_roblox_api(api_url)
-    filename = f"roblox_{user['user_id']}_{pose['pose']}.png"
-    if image_url:
-        image_content = download_url_to_bytes(image_url)
-        if image_content is None:
-            print(f"[red]Error[/]: Failed to download [blue]{pose["pose"]}[/] image for user [blue]{user['username']}[/] of ID [blue]{user['user_id']}[/]) from {image_url}")
-            progress.update(task, advance=1)
-            return
-        result = find_next_available_file_path(ROBLOX_DOWNLOAD_FOLDER, filename, image_content, suffix_on_original_file_and_take_its_spot=True)
-        if result:
-            save_contents_to_file(result, image_content)
+    if not image_url:
+        print(f"[red]Error[/]: Failed to get image URL from API for [blue]{pose["pose"]}[/] image for user [blue]{user['username']}[/] of ID [blue]{user['user_id']}[/] from {image_url}")
         progress.update(task, advance=1)
-    else:
-        print(f"[red]Error[/]: No URL found for [blue]{pose["pose"]}[/] image for user [blue]{user['username']}[/] of ID [blue]{user['user_id']}[/] from {image_url}")
+        return
+    if DEBUG_MODE:
+        print(f"[blue]Loading[/]: {image_url}")
+
+    image_content = download_url_to_bytes(image_url)
+    if image_content is None:
+        print(f"[red]Error[/]: Failed to download image for [blue]{pose["pose"]}[/] image for user [blue]{user['username']}[/] of ID [blue]{user['user_id']}[/] from {image_url}")
+        progress.update(task, advance=1)
+        return
+
+    filename = f"roblox_{user['user_id']}_{pose['pose']}.png"
+    file_path = find_next_available_file_path(ROBLOX_DOWNLOAD_FOLDER, filename, image_content, suffix_on_original_file_and_take_its_spot=True)
+    if file_path:
+        save_contents_to_file(file_path, image_content)
+    progress.update(task, advance=1)
 
 
 def get_image_url_from_roblox_api(api_url: str) -> str | None:
@@ -152,22 +157,26 @@ def download_roblox_outfits(progress: Progress, task: TaskID, all_asset_ids: lis
     for outfit_id in all_asset_ids:
         api_url = ROBLOX_OUTFIT_LINK_TEMPLATE.format(outfit_id=outfit_id)
         image_url = get_image_url_from_roblox_api(api_url)
-        folder_path = Path(ROBLOX_DOWNLOAD_FOLDER, "outfits")
+        if not image_url:
+            print(f"[red]Error[/]: Failed to get image URL from API for outfit type [blue]{outfit_type}[/] of ID [blue]{outfit_id}[/] from {image_url}")
+            progress.update(task, advance=1)
+            return
+        if DEBUG_MODE:
+            print(f"[blue]Loading[/]: {image_url}")
+
+        image_content = download_url_to_bytes(image_url)
+        if image_content is None:
+            print(f"[red]Error[/]: Failed to download image for outfit type [blue]{outfit_type}[/] of ID [blue]{outfit_id}[/] from {image_url}")
+            progress.update(task, advance=1)
+            return
+
         outfit_type = image_url.split("/")[-3] if image_url else "unknown"
         file_name = f"roblox_outfit_{outfit_type}_{outfit_id}.png"
-        folder_path.mkdir(parents=True, exist_ok=True)
-        if image_url:
-            image_content = download_url_to_bytes(image_url)
-            if image_content is None:
-                print(f"[red]Error[/]: Failed to download image for outfit type [blue]{outfit_type}[/] of ID [blue]{outfit_id}[/] from {image_url}")
-                progress.update(task, advance=1)
-                return
-            result = find_next_available_file_path(folder_path, file_name, image_content, suffix_on_original_file_and_take_its_spot=True)
-            if result:
-                save_contents_to_file(result, image_content)
-            progress.update(task, advance=1)
-        else:
-            print(f"[red]Error[/]: No URL found for outfit type [blue]{outfit_type}[/] of ID [blue]{outfit_id}[/] from {image_url}")
+        folder_path = Path(ROBLOX_DOWNLOAD_FOLDER, "outfits")
+        file_path = find_next_available_file_path(folder_path, file_name, image_content, suffix_on_original_file_and_take_its_spot=True)
+        if file_path:
+            save_contents_to_file(file_path, image_content)
+        progress.update(task, advance=1)
 
 
 if __name__ == "__main__":

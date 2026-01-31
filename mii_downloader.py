@@ -2,7 +2,6 @@ import sys
 
 sys.dont_write_bytecode = True
 
-import os
 from pathlib import Path
 
 from rich import print
@@ -75,16 +74,16 @@ def process_image(progress: Progress, task: TaskID, mii: dict[str, str], pose: s
     url = generate_url(mii, pose, expression, frames, shading)
     if DEBUG_MODE:
         print(f"[blue]Loading[/]: {url}")
+
     image_content = download_url_to_bytes(url)
     if image_content is None:
-        print(f"[red]Error[/]: Failed to download image from {url}.")
+        print(f"[red]Error[/]: Failed to download image for [blue]{pose} {expression}[/] for [blue]{mii["name"]}[/] from {url}")
         return
 
     if MII_SAVE_ROTATING_FRAMES or frames == 1:
         file_name = generate_filename(mii, pose, expression, shading, "png")
         output_dir = Path(MII_DOWNLOAD_FOLDER) / mii["name"]
         output_dir = output_dir / (str(frames) + " frames") if frames != 1 else output_dir
-        os.makedirs(output_dir, exist_ok=True)
         file_path = find_next_available_file_path(output_dir, file_name, image_content)
         if file_path:
             save_contents_to_file(file_path, image_content)
@@ -93,7 +92,6 @@ def process_image(progress: Progress, task: TaskID, mii: dict[str, str], pose: s
     if MII_SAVE_ROTATING_GIFS and frames != 1:
         file_name = generate_filename(mii, pose, expression, shading, "gif")
         output_dir = Path(MII_DOWNLOAD_FOLDER) / mii["name"]
-        os.makedirs(output_dir, exist_ok=True)
         gif_bytes = render_gif_from_frames(image_content, frames)
         file_path = find_next_available_file_path(output_dir, file_name, gif_bytes)
         if file_path:
