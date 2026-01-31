@@ -218,6 +218,7 @@ def find_next_available_file_path(folder_path: str | Path, file_name: str, file_
         folder_path = Path(folder_path)
     file_path = folder_path / file_name
 
+    os.makedirs(folder_path, exist_ok=True)
     if not file_path.exists():
         return file_path
     if identical_or_same_size_file(file_path, file_content):

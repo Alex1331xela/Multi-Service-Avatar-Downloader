@@ -25,12 +25,12 @@ from config import (
 )
 
 
-def download_mii_images(progress: Progress) -> None:
+def download_mii_avatars(progress: Progress) -> None:
     """
     Downloads Mii images based on the specified parameters.
     """
     total_downloads = calculate_total_downloads()
-    task = progress.add_task("[magenta]Downloading Miis...[/]", total=total_downloads)
+    task = progress.add_task("[magenta]Downloading Mii avatars...[/]", total=total_downloads)
 
     for pose in MII_POSES:
         for expression in MII_EXPRESSIONS:
@@ -159,4 +159,4 @@ if __name__ == "__main__":
         BarColumn(),
         TaskProgressColumn(text_format="[progress.percentage]{task.percentage:.2f} %"),
     ) as progress:
-        download_mii_images(progress)
+        download_mii_avatars(progress)
