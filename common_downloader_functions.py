@@ -277,3 +277,34 @@ def save_contents_to_file(file_path: str | Path, file_content: bytes, overwrite:
     with open(file_path, "wb") as f:
         f.write(file_content)
     print(f"[green]Downloaded[/]: {file_path}")
+
+
+def console_pause() -> None:
+    """
+    Pauses the console until the user presses any key.
+    """
+    if os.name == "nt":  # Windows
+        import msvcrt
+
+        print("Press any key to exit...")
+        msvcrt.getch()
+    else:  # Unix-based systems (Linux, macOS)
+        import termios
+        import sys
+
+        print("Press any key to exit...")
+        sys.stdout.flush()
+
+        # Configure terminal to capture a single keypress without displaying it
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        new_settings = termios.tcgetattr(fd)
+        new_settings[3] = new_settings[3] & ~(termios.ECHO | termios.ICANON)
+        termios.tcsetattr(fd, termios.TCSADRAIN, new_settings)
+
+        try:
+            # Wait for a single keypress to exit
+            os.read(fd, 1)
+        finally:
+            # Restore original terminal settings
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
