@@ -51,9 +51,9 @@ def download_mii_avatars(progress: Progress) -> None:
 
     for pose in MII_POSES:
         for expression in MII_EXPRESSIONS:
-            for mii in (mii for mii in MIIS_NINTENDO_ACCOUNT + MIIS_MII_STUDIO + MIIS_NINTENDO_NETWORK_ID if "mii_id" in mii or "mii_code" in mii):
+            for mii in (mii for mii in MIIS_NINTENDO_ACCOUNT + MIIS_MII_STUDIO + MIIS_NINTENDO_NETWORK_ID if ("mii_id" in mii or "mii_code" in mii)):
                 process_image(progress, task, mii, pose, expression)
-            for mii in (mii for mii in MIIS_NINTENDO_ACCOUNT + MIIS_MII_STUDIO + MIIS_NINTENDO_NETWORK_ID if MII_SAVE_HD_IMAGES and "mii_renderer_real" in mii):
+            for mii in (mii for mii in MIIS_NINTENDO_ACCOUNT + MIIS_MII_STUDIO + MIIS_NINTENDO_NETWORK_ID if MII_SAVE_HD_IMAGES and ("mii_code" in mii or "nnid" in mii)):
                 for shading in MII_SHADINGS:
                     process_image(progress, task, mii, pose, expression, shading=shading)
 
@@ -65,10 +65,10 @@ def calculate_total_downloads() -> int:
     :return: The total number of downloads.
     """
     total_downloads_nintendo_servers = (
-        len(MII_POSES) * len(MII_EXPRESSIONS) * len([mii for mii in MIIS_NINTENDO_ACCOUNT + MIIS_MII_STUDIO + MIIS_NINTENDO_NETWORK_ID if "mii_id" in mii or "mii_code" in mii])
+        len(MII_POSES) * len(MII_EXPRESSIONS) * len([mii for mii in MIIS_NINTENDO_ACCOUNT + MIIS_MII_STUDIO + MIIS_NINTENDO_NETWORK_ID if ("mii_id" in mii or "mii_code" in mii)])
     )
     total_downloads_mii_renderer_real = (
-        (len(MII_POSES) * len(MII_EXPRESSIONS) * len(MII_SHADINGS) * len([mii for mii in MIIS_NINTENDO_ACCOUNT + MIIS_MII_STUDIO + MIIS_NINTENDO_NETWORK_ID if "mii_renderer_real" in mii]))
+        (len(MII_POSES) * len(MII_EXPRESSIONS) * len(MII_SHADINGS) * len([mii for mii in MIIS_NINTENDO_ACCOUNT + MIIS_MII_STUDIO + MIIS_NINTENDO_NETWORK_ID if ("mii_code" in mii or "nnid" in mii)]))
         if MII_SAVE_HD_IMAGES
         else 0
     )
