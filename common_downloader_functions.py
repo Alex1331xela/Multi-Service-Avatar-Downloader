@@ -154,18 +154,20 @@ def images_to_gif(images_bytes_list: Sequence[str | Path | bytes]) -> bytes:
     return byte_io.getvalue()
 
 
-def file_hash(file_path: str | Path) -> str:
+def file_hash(file: str | Path | bytes) -> str:
     """
-    Calculates the `MD5` hash of a file.
+    Calculates the `MD5` hash of a file or raw bytes.
 
-    :param file_path: The path to the file.
-    :return: The `MD5` hash of the file as a hexadecimal string.
+    :param file: The path to the file or bytes content.
+    :return: The `MD5` hash as a hexadecimal string.
     """
-    hash_md5 = hashlib.md5()
-    with open(file_path, "rb") as f:
+    if isinstance(file, (bytes, bytearray)):
+        return hashlib.md5(file).hexdigest()
+
+    with open(file, "rb") as f:
         for chunk in iter(lambda: f.read(4096), b""):
-            hash_md5.update(chunk)
-    return hash_md5.hexdigest()
+            hashlib.md5().update(chunk)
+    return hashlib.md5().hexdigest()
 
 
 def is_identical_file(file_1: str | Path | bytes, file_2: str | Path | bytes, size_only: bool = False) -> bool:
@@ -200,21 +202,22 @@ def is_identical_file(file_1: str | Path | bytes, file_2: str | Path | bytes, si
         return file_1_hash == file_2_hash
 
 
-def identical_or_same_size_file(folder_path: str | Path, file_content: bytes) -> bool:
+def identical_or_same_size_file(file_1: str | Path | bytes, file_2: str | Path | bytes) -> bool:
     """
-    Checks if the file at the given path is either identical to the provided content or has the same size.
+    Checks if one file is either identical to another or has the same size.
 
-    :param path: The path to the existing file.
+    :param file_1: The first file path or content in bytes.
+    :param file_2: The second file path or content in bytes.
     :return: `True` if the file is identical or has the same size, `False` otherwise.
     """
-    if is_identical_file(folder_path, file_content, size_only=True):
-        if is_identical_file(folder_path, file_content):
+    if is_identical_file(file_1, file_2, size_only=True):
+        if is_identical_file(file_1, file_2):
             if DEBUG_MODE:
-                print(f"Skipped ([green]identical[/]): {folder_path}")
+                print(f"Skipped ([green]identical[/]): {file_1}")
             return True
         else:
             if DEBUG_MODE:
-                print(f"Skipped ([yellow]different[/]): {folder_path}")
+                print(f"Skipped ([yellow]different[/]): {file_1}")
             return True
     return False
 
