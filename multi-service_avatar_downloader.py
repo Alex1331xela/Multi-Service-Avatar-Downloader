@@ -1,3 +1,7 @@
+import sys
+
+sys.dont_write_bytecode = True
+
 from mii_downloader import download_mii_avatars
 from roblox_avatar_downloader import download_roblox_avatars_and_outfits
 from common_downloader_functions import progress_bar
