@@ -2,11 +2,10 @@ import sys
 
 sys.dont_write_bytecode = True
 
-import time
 from pathlib import Path
-
 from rich import print
 from rich.progress import Progress, TaskID
+import time
 
 
 from common_downloader_functions import progress_bar, download_url_to_bytes, download_url_to_json, find_next_available_file_path, save_contents_to_file

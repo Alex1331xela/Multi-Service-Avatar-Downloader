@@ -3,7 +3,6 @@ import sys
 sys.dont_write_bytecode = True
 
 from pathlib import Path
-
 from rich import print
 from rich.progress import Progress, TaskID
 
