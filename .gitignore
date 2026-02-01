@@ -208,5 +208,6 @@ __marimo__/
 
 # Multi-Service Avatar Downloader
 config.py
+gta_online/
 mii/
 roblox/
