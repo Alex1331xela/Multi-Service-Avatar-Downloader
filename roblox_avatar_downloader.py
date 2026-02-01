@@ -16,9 +16,9 @@ from config import (
     ROBLOX_POSES,
     ROBLOX_DOWNLOAD_FOLDER,
     ROBLOX_SAVE_OUTFIT_IMAGES,
-    ROBLOX_AVATAR_LINK_TEMPLATE,
-    ROBLOX_CURRENT_OUTFIT_TEMPLATE,
-    ROBLOX_OUTFIT_LINK_TEMPLATE,
+    ROBLOX_LINK_TEMPLATE_AVATAR,
+    ROBLOX_LINK_TEMPLATE_CURRENT_OUTFIT,
+    ROBLOX_LINK_TEMPLATE_OUTFIT,
 )
 
 
@@ -53,7 +53,7 @@ def load_outfit_asset_ids(progress: Progress, task: TaskID) -> list[str]:
     """
     all_asset_ids = []
     for user in ROBLOX_USER_IDS:
-        current_outfit_url = ROBLOX_CURRENT_OUTFIT_TEMPLATE.format(user_id=user["user_id"])
+        current_outfit_url = ROBLOX_LINK_TEMPLATE_CURRENT_OUTFIT.format(user_id=user["user_id"])
         asset_ids = get_outfit_asset_ids(current_outfit_url)
         if not asset_ids:
             print(f"[red]Error[/]: No outfit asset IDs found for [blue]{user['username']}[/] ([blue]{user['user_id']}[/]) at {current_outfit_url}")
@@ -105,7 +105,7 @@ def download_roblox_avatars(progress: Progress, task: TaskID, user: dict[str, st
     :param user: A dictionary containing user information, including `user_id`.
     :param pose: A dictionary containing pose information, including `pose` and `size`.
     """
-    api_url = ROBLOX_AVATAR_LINK_TEMPLATE.format(user_id=user["user_id"], pose=pose["pose"], size=pose["size"])
+    api_url = ROBLOX_LINK_TEMPLATE_AVATAR.format(user_id=user["user_id"], pose=pose["pose"], size=pose["size"])
     image_url = get_image_url_from_roblox_api(api_url)
     if not image_url:
         print(f"[red]Error[/]: Failed to get image URL from API for [blue]{pose["pose"]}[/] image for user [blue]{user['username']}[/] of ID [blue]{user['user_id']}[/] from {image_url}")
@@ -155,7 +155,7 @@ def download_roblox_outfits(progress: Progress, task: TaskID, outfit_id: str) ->
 
     :param outfit_id: A string containing the outfit ID to download.
     """
-    api_url = ROBLOX_OUTFIT_LINK_TEMPLATE.format(outfit_id=outfit_id)
+    api_url = ROBLOX_LINK_TEMPLATE_OUTFIT.format(outfit_id=outfit_id)
     image_url = get_image_url_from_roblox_api(api_url)
     if not image_url:
         print(f"[red]Error[/]: Failed to get image URL from API for ID [blue]{outfit_id}[/] from {image_url}")

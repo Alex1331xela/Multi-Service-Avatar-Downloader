@@ -20,9 +20,9 @@ from config import (
     MII_POSES,
     MII_EXPRESSIONS,
     MII_SHADINGS,
-    LINK_TEMPLATE_NINTENDO_ACCOUNT,
-    LINK_TEMPLATE_MII_STUDIO,
-    LINK_TEMPLATE_MII_RENDERER_REAL,
+    MII_LINK_TEMPLATE_NINTENDO_ACCOUNT,
+    MII_LINK_TEMPLATE_MII_STUDIO,
+    MII_LINK_TEMPLATE_MII_RENDERER_REAL,
 )
 
 
@@ -124,14 +124,14 @@ def generate_url(mii: dict[str, str], pose: str, expression: str, frames: int, s
         elif "nnid" in mii:
             data_or_nnid = "nnid"
             mii_code_or_nnid = mii["nnid"]
-        to_return = LINK_TEMPLATE_MII_RENDERER_REAL.format(data_or_nnid=data_or_nnid, mii_code_or_nnid=mii_code_or_nnid, expression=expression, pose=pose, frame_count=frames_str, shading=shading)
+        to_return = MII_LINK_TEMPLATE_MII_RENDERER_REAL.format(data_or_nnid=data_or_nnid, mii_code_or_nnid=mii_code_or_nnid, expression=expression, pose=pose, frame_count=frames_str, shading=shading)
         max_width = (16384 - 1) // frames  # Ensure width * frames < 16384
         width = min(1200, max_width)  # use the calculated max_width if less than 1200
         return to_return.replace("width=1200", f"width={width}")
     elif "mii_id" in mii:
-        return LINK_TEMPLATE_NINTENDO_ACCOUNT.format(mii_id=mii["mii_id"], expression=expression, pose=pose, frame_count=frames_str)
+        return MII_LINK_TEMPLATE_NINTENDO_ACCOUNT.format(mii_id=mii["mii_id"], expression=expression, pose=pose, frame_count=frames_str)
     elif "mii_code" in mii:
-        return LINK_TEMPLATE_MII_STUDIO.format(mii_code=mii["mii_code"], expression=expression, pose=pose, frame_count=frames_str)
+        return MII_LINK_TEMPLATE_MII_STUDIO.format(mii_code=mii["mii_code"], expression=expression, pose=pose, frame_count=frames_str)
     return ""
 
 
