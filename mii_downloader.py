@@ -5,9 +5,9 @@ sys.dont_write_bytecode = True
 from pathlib import Path
 
 from rich import print
-from rich.progress import Progress, TaskID, SpinnerColumn, TextColumn, MofNCompleteColumn, BarColumn, TaskProgressColumn
+from rich.progress import Progress, TaskID
 
-from common_downloader_functions import download_url_to_bytes, render_gif_from_frames, find_next_available_file_path, save_contents_to_file
+from common_downloader_functions import progress_bar, download_url_to_bytes, render_gif_from_frames, find_next_available_file_path, save_contents_to_file
 from config import (
     DEBUG_MODE,
     MIIS_NINTENDO_ACCOUNT,
@@ -155,11 +155,5 @@ def generate_filename(mii: dict[str, str], pose: str, expression: str, shading: 
 
 
 if __name__ == "__main__":
-    with Progress(
-        SpinnerColumn(finished_text="✔"),
-        TextColumn("[progress.description]{task.description}"),
-        MofNCompleteColumn(),
-        BarColumn(),
-        TaskProgressColumn(text_format="[progress.percentage]{task.percentage:.2f} %"),
-    ) as progress:
+    with progress_bar() as progress:
         download_mii_avatars(progress)

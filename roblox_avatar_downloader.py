@@ -6,10 +6,10 @@ import time
 from pathlib import Path
 
 from rich import print
-from rich.progress import Progress, TaskID, SpinnerColumn, TextColumn, MofNCompleteColumn, BarColumn, TaskProgressColumn
+from rich.progress import Progress, TaskID
 
 
-from common_downloader_functions import download_url_to_bytes, download_url_to_json, find_next_available_file_path, save_contents_to_file
+from common_downloader_functions import progress_bar, download_url_to_bytes, download_url_to_json, find_next_available_file_path, save_contents_to_file
 from config import (
     DEBUG_MODE,
     ROBLOX_USER_IDS,
@@ -116,7 +116,7 @@ def download_roblox_avatars(progress: Progress, task: TaskID, user: dict[str, st
 
     image_content = download_url_to_bytes(image_url)
     if image_content is None:
-        print(f"[red]Error[/]: Failed to download image for [blue]{pose["pose"]}[/] image for user [blue]{user['username']}[/] of ID [blue]{user['user_id']}[/] from {image_url}")
+        print(f"[red]Error[/]: Failed to download [blue]{pose["pose"]}[/] image for user [blue]{user['username']}[/] (ID [blue]{user['user_id']})[/] from {image_url}")
         progress.update(task, advance=1)
         return
 
@@ -180,11 +180,5 @@ def download_roblox_outfits(progress: Progress, task: TaskID, outfit_id: str) ->
 
 
 if __name__ == "__main__":
-    with Progress(
-        SpinnerColumn(finished_text="✔"),
-        TextColumn("[progress.description]{task.description}"),
-        MofNCompleteColumn(),
-        BarColumn(),
-        TaskProgressColumn(text_format="[progress.percentage]{task.percentage:.2f} %"),
-    ) as progress:
+    with progress_bar() as progress:
         download_roblox_avatars_and_outfits(progress)

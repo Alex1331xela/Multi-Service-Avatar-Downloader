@@ -8,8 +8,24 @@ import io
 from PIL import Image
 import requests
 from rich import print
+from rich.progress import Progress, SpinnerColumn, TextColumn, MofNCompleteColumn, BarColumn, TaskProgressColumn
 
 from config import DEBUG_MODE
+
+
+def progress_bar() -> Progress:
+    """
+    Returns a `Progress` class with customized arguments for use in a progress bar.
+
+    :return: A `Progress` class with customized arguments.
+    """
+    return Progress(
+        SpinnerColumn(finished_text="✔"),
+        TextColumn("[progress.description]{task.description}"),
+        MofNCompleteColumn(),
+        BarColumn(),
+        TaskProgressColumn(text_format="[progress.percentage]{task.percentage:.2f} %"),
+    )
 
 
 def download_url_to_raw(url: str) -> requests.Response | None:
