@@ -3,6 +3,8 @@ A downloader written in Python that downloads avatars from multiple different se
 > Project started: October 12th, 2021.
 
 ### Currently supported services/platforms:
+- Grand Theft Auto Online
+    - using a GTA Online username
 - Nintendo Miis
     - using a Mii Studio code, Nintendo Network ID, or Nintendo Account ID
     - optional: download a GIF of the Mii spinning
