@@ -106,13 +106,13 @@ def _process_individual_image(progress: Progress, task: TaskID, mii: dict[str, s
 
     image_content = download_url_to_bytes(url)
     if image_content is None:
-        print(f"[red]Error[/]: Failed to download image for [blue]{pose} {expression}[/] for [blue]{mii["name"]}[/] from {url}")
+        print(f"[red]Error[/]: Failed to download image for [blue]{pose} {expression}[/] for [blue]{mii["mii_name"]}[/] from {url}")
         progress.update(task, advance=1)
         return
 
     if MII_SAVE_ROTATING_FRAMES or frames == 1:
         file_name = _generate_filename(mii, pose, expression, shading, "png")
-        output_dir = Path(MII_DOWNLOAD_FOLDER) / mii["name"]
+        output_dir = Path(MII_DOWNLOAD_FOLDER) / mii["mii_name"]
         output_dir = output_dir / (str(frames) + " frames") if frames != 1 else output_dir
         file_path = find_next_available_file_path(output_dir, file_name, image_content)
         if file_path:
@@ -121,7 +121,7 @@ def _process_individual_image(progress: Progress, task: TaskID, mii: dict[str, s
 
     if MII_SAVE_ROTATING_GIFS and frames != 1:
         file_name = _generate_filename(mii, pose, expression, shading, "gif")
-        output_dir = Path(MII_DOWNLOAD_FOLDER) / mii["name"]
+        output_dir = Path(MII_DOWNLOAD_FOLDER) / mii["mii_name"]
         gif_bytes = render_gif_from_frames(image_content, frames)
         file_path = find_next_available_file_path(output_dir, file_name, gif_bytes)
         if file_path:
@@ -178,7 +178,7 @@ def _generate_filename(mii: dict[str, str], pose: str, expression: str, shading:
         shading = f"_{shading}"
     else:
         shading = ""
-    return f"Mii_{mii['name']}_{pose.replace('_', '-')}_{expression.replace('_', '-')}{shading}.{extension}"
+    return f"Mii_{mii['mii_name']}_{pose.replace('_', '-')}_{expression.replace('_', '-')}{shading}.{extension}"
 
 
 if __name__ == "__main__":
