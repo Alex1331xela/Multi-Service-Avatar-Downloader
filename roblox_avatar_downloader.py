@@ -120,8 +120,8 @@ def download_roblox_avatars(progress: Progress, task: TaskID, user: dict[str, st
         progress.update(task, advance=1)
         return
 
-    filename = f"roblox_{user['user_id']}_{pose['pose']}.png"
-    file_path = find_next_available_file_path(ROBLOX_DOWNLOAD_FOLDER, filename, image_content)
+    file_name = f"roblox_{user['user_id']}_{pose['pose']}.png"
+    file_path = find_next_available_file_path(ROBLOX_DOWNLOAD_FOLDER, file_name, image_content)
     if file_path:
         save_contents_to_file(file_path, image_content)
     progress.update(task, advance=1)

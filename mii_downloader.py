@@ -81,6 +81,7 @@ def process_image(progress: Progress, task: TaskID, mii: dict[str, str], pose: s
     image_content = download_url_to_bytes(url)
     if image_content is None:
         print(f"[red]Error[/]: Failed to download image for [blue]{pose} {expression}[/] for [blue]{mii["name"]}[/] from {url}")
+        progress.update(task, advance=1)
         return
 
     if MII_SAVE_ROTATING_FRAMES or frames == 1:
