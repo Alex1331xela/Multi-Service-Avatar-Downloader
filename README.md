@@ -1,5 +1,6 @@
 # Multi-Service Avatar Downloader
 A downloader written in Python that downloads avatars from multiple different services/platforms.
+> Project started: October 12th, 2021.
 
 ### Currently supported services/platforms:
 - Nintendo Miis
