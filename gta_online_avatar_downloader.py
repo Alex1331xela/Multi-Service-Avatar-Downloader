@@ -17,10 +17,10 @@ def download_gta_avatars(progress: Progress) -> None:
     task = progress.add_task("[magenta]Downloading GTA Online avatars...[/]", total=total_downloads)
 
     for character_name in GTA_CHARACTER_NAMES:
-        check_and_replace_icons(progress, task, character_name)
+        _download_character_avatar(progress, task, character_name)
 
 
-def check_and_replace_icons(progress: Progress, task: TaskID, character_name: str) -> None:
+def _download_character_avatar(progress: Progress, task: TaskID, character_name: str) -> None:
     random_seed = f"{random.randint(0, 9999):04d}"
     url = GTA_LINK_TEMPLATE.format(random_four_digits=random_seed, character_name=character_name)
     if DEBUG_MODE:

@@ -7,7 +7,7 @@ from rich import print
 from rich.progress import Progress, TaskID
 
 from common_downloader_functions import progress_bar, download_url_to_bytes, render_gif_from_frames, find_next_available_file_path, save_contents_to_file
-from config import DEBUG_MODE, MIIS_NINTENDO_ACCOUNT, MIIS_MII_STUDIO, MIIS_NINTENDO_NETWORK_ID, MII_DOWNLOAD_FOLDER, MII_SAVE_HD_IMAGES, MII_SAVE_ROTATING_GIFS, MII_SAVE_ROTATING_FRAMES
+from config import DEBUG_MODE, MIIS, MII_DOWNLOAD_FOLDER, MII_SAVE_HD_IMAGES, MII_SAVE_ROTATING_GIFS, MII_SAVE_ROTATING_FRAMES
 
 MII_POSES = ["face", "face_only", "all_body"]  # list of all rendered poses to download
 MII_EXPRESSIONS = [
@@ -46,32 +46,25 @@ def download_mii_avatars(progress: Progress) -> None:
     """
     Downloads Mii images based on the specified parameters.
     """
-    total_downloads = calculate_total_downloads()
+    total_downloads = _calculate_total_downloads()
     task = progress.add_task("[magenta]Downloading Mii avatars...[/]", total=total_downloads)
 
-    for pose in MII_POSES:
-        for expression in MII_EXPRESSIONS:
-            for mii in (mii for mii in MIIS_NINTENDO_ACCOUNT + MIIS_MII_STUDIO + MIIS_NINTENDO_NETWORK_ID if ("mii_id" in mii or "mii_code" in mii)):
-                process_image(progress, task, mii, pose, expression)
-            for mii in (mii for mii in MIIS_NINTENDO_ACCOUNT + MIIS_MII_STUDIO + MIIS_NINTENDO_NETWORK_ID if MII_SAVE_HD_IMAGES and ("mii_code" in mii or "nnid" in mii)):
-                for shading in MII_SHADINGS:
-                    process_image(progress, task, mii, pose, expression, shading=shading)
+    for mii in MIIS:
+        if not (("mii_id" in mii or "mii_code" in mii) or (MII_SAVE_HD_IMAGES and ("mii_code" in mii or "nnid" in mii))):
+            continue  # skip Miis that are improperly formatted / missing the necessary info to download
+        for pose in MII_POSES:
+            for expression in MII_EXPRESSIONS:
+                _seperate_downloading_sd_vs_hd(progress, task, mii, pose, expression)
 
 
-def calculate_total_downloads() -> int:
+def _calculate_total_downloads() -> int:
     """
     Calculates the total number of downloads to be performed.
 
     :return: The total number of downloads.
     """
-    total_downloads_nintendo_servers = (
-        len(MII_POSES) * len(MII_EXPRESSIONS) * len([mii for mii in MIIS_NINTENDO_ACCOUNT + MIIS_MII_STUDIO + MIIS_NINTENDO_NETWORK_ID if ("mii_id" in mii or "mii_code" in mii)])
-    )
-    total_downloads_mii_renderer_real = (
-        (len(MII_POSES) * len(MII_EXPRESSIONS) * len(MII_SHADINGS) * len([mii for mii in MIIS_NINTENDO_ACCOUNT + MIIS_MII_STUDIO + MIIS_NINTENDO_NETWORK_ID if ("mii_code" in mii or "nnid" in mii)]))
-        if MII_SAVE_HD_IMAGES
-        else 0
-    )
+    total_downloads_nintendo_servers = len(MII_POSES) * len(MII_EXPRESSIONS) * len([mii for mii in MIIS if ("mii_id" in mii or "mii_code" in mii)])
+    total_downloads_mii_renderer_real = (len(MII_POSES) * len(MII_EXPRESSIONS) * len(MII_SHADINGS) * len([mii for mii in MIIS if ("mii_code" in mii or "nnid" in mii)])) if MII_SAVE_HD_IMAGES else 0
     total = total_downloads_nintendo_servers + total_downloads_mii_renderer_real
     if MII_SAVE_ROTATING_FRAMES:
         total *= 2
@@ -80,7 +73,24 @@ def calculate_total_downloads() -> int:
     return total
 
 
-def process_image(progress: Progress, task: TaskID, mii: dict[str, str], pose: str, expression: str, shading: str = "", frames: int = 1) -> None:
+def _seperate_downloading_sd_vs_hd(progress: Progress, task: TaskID, mii: dict[str, str], pose: str, expression: str) -> None:
+    """
+    Seperates the downloading of a single mii for a given pose/expression between downloading the default image from Nintendo servers and,
+    if configured, 3rd party HD shaded variants.
+
+    :param mii: A dictionary containing Mii information.
+    :param pose: The pose of the Mii.
+    :param expression: The expression of the Mii.
+    """
+    if "mii_id" in mii or "mii_code" in mii:
+        _process_individual_image(progress, task, mii, pose, expression)  # download the SD image if mii has an id or code
+
+    if MII_SAVE_HD_IMAGES and ("mii_code" in mii or "nnid" in mii):
+        for shading in MII_SHADINGS:
+            _process_individual_image(progress, task, mii, pose, expression, shading=shading)  # download the HD image if mii has a code or nnid
+
+
+def _process_individual_image(progress: Progress, task: TaskID, mii: dict[str, str], pose: str, expression: str, shading: str = "", frames: int = 1) -> None:
     """
     Handles downloading and saving a single Mii image.
 
@@ -90,7 +100,7 @@ def process_image(progress: Progress, task: TaskID, mii: dict[str, str], pose: s
     :param shading: The shading type of the Mii.
     :param frames: The frame count of the Mii.
     """
-    url = generate_url(mii, pose, expression, frames, shading)
+    url = _generate_url(mii, pose, expression, frames, shading)
     if DEBUG_MODE:
         print(f"[blue]Loading[/]: {url}")
 
@@ -101,7 +111,7 @@ def process_image(progress: Progress, task: TaskID, mii: dict[str, str], pose: s
         return
 
     if MII_SAVE_ROTATING_FRAMES or frames == 1:
-        file_name = generate_filename(mii, pose, expression, shading, "png")
+        file_name = _generate_filename(mii, pose, expression, shading, "png")
         output_dir = Path(MII_DOWNLOAD_FOLDER) / mii["name"]
         output_dir = output_dir / (str(frames) + " frames") if frames != 1 else output_dir
         file_path = find_next_available_file_path(output_dir, file_name, image_content)
@@ -110,7 +120,7 @@ def process_image(progress: Progress, task: TaskID, mii: dict[str, str], pose: s
         progress.update(task, advance=1)
 
     if MII_SAVE_ROTATING_GIFS and frames != 1:
-        file_name = generate_filename(mii, pose, expression, shading, "gif")
+        file_name = _generate_filename(mii, pose, expression, shading, "gif")
         output_dir = Path(MII_DOWNLOAD_FOLDER) / mii["name"]
         gif_bytes = render_gif_from_frames(image_content, frames)
         file_path = find_next_available_file_path(output_dir, file_name, gif_bytes)
@@ -119,10 +129,10 @@ def process_image(progress: Progress, task: TaskID, mii: dict[str, str], pose: s
         progress.update(task, advance=1)
 
     if (MII_SAVE_ROTATING_GIFS or MII_SAVE_ROTATING_FRAMES) and frames == 1:
-        process_image(progress, task, mii, pose, expression, shading, frames=16)
+        _process_individual_image(progress, task, mii, pose, expression, shading, frames=16)
 
 
-def generate_url(mii: dict[str, str], pose: str, expression: str, frames: int, shading: str) -> str:
+def _generate_url(mii: dict[str, str], pose: str, expression: str, frames: int, shading: str) -> str:
     """
     Generates the download URL for a Mii image.
 
@@ -152,7 +162,7 @@ def generate_url(mii: dict[str, str], pose: str, expression: str, frames: int, s
     return ""
 
 
-def generate_filename(mii: dict[str, str], pose: str, expression: str, shading: str, extension: str) -> str:
+def _generate_filename(mii: dict[str, str], pose: str, expression: str, shading: str, extension: str) -> str:
     """
     Generates the filename for a Mii image.
 

@@ -24,24 +24,24 @@ def download_roblox_avatars_and_outfits(progress: Progress) -> None:
     """
     if ROBLOX_SAVE_OUTFIT_IMAGES:
         task_outfit_loading = progress.add_task("[magenta]Loading Roblox outfit assets...[/]", total=len(ROBLOX_USER_IDS))
-        all_asset_ids = load_outfit_asset_ids(progress, task_outfit_loading)
+        all_asset_ids = _load_outfit_asset_ids_to_list(progress, task_outfit_loading)
     else:
         all_asset_ids = None
 
-    total_downloads = calculate_total_downloads(all_asset_ids)
+    total_downloads = _calculate_total_downloads(all_asset_ids)
     task_downloading_avatars = progress.add_task("[magenta]Downloading Roblox avatars...[/]", total=total_downloads[1])
     if ROBLOX_SAVE_OUTFIT_IMAGES:
         task_downloading_outfits = progress.add_task("[magenta]Downloading Roblox outfits...[/]", total=total_downloads[2])
 
     for user in ROBLOX_USER_IDS:
         for pose in ROBLOX_POSES:
-            download_roblox_avatars(progress, task_downloading_avatars, user, pose)
+            _download_roblox_avatars(progress, task_downloading_avatars, user, pose)
     if ROBLOX_SAVE_OUTFIT_IMAGES and all_asset_ids:
         for outfit_id in all_asset_ids:
-            download_roblox_outfits(progress, task_downloading_outfits, outfit_id)
+            _download_roblox_outfits(progress, task_downloading_outfits, outfit_id)
 
 
-def load_outfit_asset_ids(progress: Progress, task: TaskID) -> list[str]:
+def _load_outfit_asset_ids_to_list(progress: Progress, task: TaskID) -> list[str]:
     """
     Loads the outfit asset IDs for all users.
 
@@ -50,7 +50,7 @@ def load_outfit_asset_ids(progress: Progress, task: TaskID) -> list[str]:
     all_asset_ids = []
     for user in ROBLOX_USER_IDS:
         current_outfit_url = ROBLOX_LINK_TEMPLATE_CURRENT_OUTFIT.format(user_id=user["user_id"])
-        asset_ids = get_outfit_asset_ids(current_outfit_url)
+        asset_ids = _get_outfit_asset_ids_from_api(current_outfit_url)
         if not asset_ids:
             print(f"[red]Error[/]: No outfit asset IDs found for [blue]{user['username']}[/] ([blue]{user['user_id']}[/]) at {current_outfit_url}")
             continue
@@ -66,7 +66,7 @@ def load_outfit_asset_ids(progress: Progress, task: TaskID) -> list[str]:
     return unique_asset_ids
 
 
-def get_outfit_asset_ids(current_outfit_url: str) -> list[str] | None:
+def _get_outfit_asset_ids_from_api(current_outfit_url: str) -> list[str] | None:
     """
     Fetches the outfit asset IDs from the Roblox API.
 
@@ -82,7 +82,7 @@ def get_outfit_asset_ids(current_outfit_url: str) -> list[str] | None:
         return None
 
 
-def calculate_total_downloads(unique_asset_ids: list[str] | None) -> tuple[int, int, int]:
+def _calculate_total_downloads(unique_asset_ids: list[str] | None) -> tuple[int, int, int]:
     """
     Calculates the total number of downloads to be performed.
 
@@ -94,7 +94,7 @@ def calculate_total_downloads(unique_asset_ids: list[str] | None) -> tuple[int, 
     return total, total_downloads_roblox_avatars, total_downloads_roblox_outfits
 
 
-def download_roblox_avatars(progress: Progress, task: TaskID, user: dict[str, str], pose: dict[str, str]) -> None:
+def _download_roblox_avatars(progress: Progress, task: TaskID, user: dict[str, str], pose: dict[str, str]) -> None:
     """
     Downloads Roblox avatar images based on the specified parameters.
 
@@ -102,7 +102,7 @@ def download_roblox_avatars(progress: Progress, task: TaskID, user: dict[str, st
     :param pose: A dictionary containing pose information, including `pose` and `size`.
     """
     api_url = ROBLOX_LINK_TEMPLATE_AVATAR.format(user_id=user["user_id"], pose=pose["pose"], size=pose["size"])
-    image_url = get_image_url_from_roblox_api(api_url)
+    image_url = _get_image_url_from_roblox_api(api_url)
     if not image_url:
         print(f"[red]Error[/]: Failed to get image URL from API for [blue]{pose["pose"]}[/] image for user [blue]{user['username']}[/] of ID [blue]{user['user_id']}[/] from {image_url}")
         progress.update(task, advance=1)
@@ -123,7 +123,7 @@ def download_roblox_avatars(progress: Progress, task: TaskID, user: dict[str, st
     progress.update(task, advance=1)
 
 
-def get_image_url_from_roblox_api(api_url: str) -> str | None:
+def _get_image_url_from_roblox_api(api_url: str) -> str | None:
     """
     Fetches the avatar image URL from the Roblox API.
 
@@ -140,19 +140,19 @@ def get_image_url_from_roblox_api(api_url: str) -> str | None:
                 if DEBUG_MODE:
                     print(f"[yellow]Warning[/]: Image generation pending for {api_url}")
                 time.sleep(5)
-                return get_image_url_from_roblox_api(api_url)
+                return _get_image_url_from_roblox_api(api_url)
     except Exception as error:
         print(f"[red]Error[/]: Problem fetching {api_url}: {error}")
 
 
-def download_roblox_outfits(progress: Progress, task: TaskID, outfit_id: str) -> None:
+def _download_roblox_outfits(progress: Progress, task: TaskID, outfit_id: str) -> None:
     """
     Downloads Roblox outfit images based on the specified parameters.
 
     :param outfit_id: A string containing the outfit ID to download.
     """
     api_url = ROBLOX_LINK_TEMPLATE_OUTFIT.format(outfit_id=outfit_id)
-    image_url = get_image_url_from_roblox_api(api_url)
+    image_url = _get_image_url_from_roblox_api(api_url)
     if not image_url:
         print(f"[red]Error[/]: Failed to get image URL from API for ID [blue]{outfit_id}[/] from {image_url}")
         progress.update(task, advance=1)
