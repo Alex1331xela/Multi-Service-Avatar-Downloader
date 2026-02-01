@@ -7,7 +7,11 @@ from rich import print
 from rich.progress import Progress, TaskID
 
 from common_downloader_functions import progress_bar, download_url_to_bytes, file_hash, find_next_available_file_path, save_contents_to_file
-from config import DEBUG_MODE, GTA_CHARACTER_NAMES, GTA_DOWNLOAD_FOLDER
+
+try:
+    from config import DEBUG_MODE, GTA_CHARACTER_NAMES, GTA_DOWNLOAD_FOLDER
+except ImportError:
+    from config_default import DEBUG_MODE, GTA_CHARACTER_NAMES, GTA_DOWNLOAD_FOLDER
 
 GTA_LINK_TEMPLATE = "https://prod.cloud.rockstargames.com/members/np/{random_four_digits}/{character_name}/publish/gta5/mpchars/0_ps4.png"
 

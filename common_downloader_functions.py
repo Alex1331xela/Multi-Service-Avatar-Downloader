@@ -10,7 +10,10 @@ import requests
 from rich import print
 from rich.progress import Progress, SpinnerColumn, TextColumn, MofNCompleteColumn, BarColumn, TaskProgressColumn
 
-from config import DEBUG_MODE
+try:
+    from config import DEBUG_MODE
+except ImportError:
+    from config_default import DEBUG_MODE
 
 
 def progress_bar() -> Progress:

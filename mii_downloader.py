@@ -7,7 +7,11 @@ from rich import print
 from rich.progress import Progress, TaskID
 
 from common_downloader_functions import progress_bar, download_url_to_bytes, render_gif_from_frames, find_next_available_file_path, save_contents_to_file
-from config import DEBUG_MODE, MIIS, MII_DOWNLOAD_FOLDER, MII_SAVE_HD_IMAGES, MII_SAVE_ROTATING_GIFS, MII_SAVE_ROTATING_FRAMES
+
+try:
+    from config import DEBUG_MODE, MIIS, MII_DOWNLOAD_FOLDER, MII_SAVE_HD_IMAGES, MII_SAVE_ROTATING_GIFS, MII_SAVE_ROTATING_FRAMES
+except ImportError:
+    from config_default import DEBUG_MODE, MIIS, MII_DOWNLOAD_FOLDER, MII_SAVE_HD_IMAGES, MII_SAVE_ROTATING_GIFS, MII_SAVE_ROTATING_FRAMES
 
 MII_POSES = ["face", "face_only", "all_body"]  # list of all rendered poses to download
 MII_EXPRESSIONS = [

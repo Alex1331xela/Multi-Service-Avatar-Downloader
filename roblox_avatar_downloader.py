@@ -9,7 +9,11 @@ import time
 
 
 from common_downloader_functions import progress_bar, download_url_to_bytes, download_url_to_json, find_next_available_file_path, save_contents_to_file
-from config import DEBUG_MODE, ROBLOX_USER_IDS, ROBLOX_DOWNLOAD_FOLDER, ROBLOX_SAVE_OUTFIT_IMAGES
+
+try:
+    from config import DEBUG_MODE, ROBLOX_USER_IDS, ROBLOX_DOWNLOAD_FOLDER, ROBLOX_SAVE_OUTFIT_IMAGES
+except ImportError:
+    from config_default import DEBUG_MODE, ROBLOX_USER_IDS, ROBLOX_DOWNLOAD_FOLDER, ROBLOX_SAVE_OUTFIT_IMAGES
 
 ROBLOX_POSES = [{"pose": "avatar", "size": "720x720"}, {"pose": "avatar-headshot", "size": "720x720"}, {"pose": "avatar-bust", "size": "420x420"}]
 
