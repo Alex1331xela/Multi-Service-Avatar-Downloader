@@ -7,22 +7,39 @@ from rich import print
 from rich.progress import Progress, TaskID
 
 from common_downloader_functions import progress_bar, download_url_to_bytes, render_gif_from_frames, find_next_available_file_path, save_contents_to_file
-from config import (
-    DEBUG_MODE,
-    MIIS_NINTENDO_ACCOUNT,
-    MIIS_MII_STUDIO,
-    MIIS_NINTENDO_NETWORK_ID,
-    MII_DOWNLOAD_FOLDER,
-    MII_SAVE_HD_IMAGES,
-    MII_SAVE_ROTATING_GIFS,
-    MII_SAVE_ROTATING_FRAMES,
-    MII_POSES,
-    MII_EXPRESSIONS,
-    MII_SHADINGS,
-    MII_LINK_TEMPLATE_NINTENDO_ACCOUNT,
-    MII_LINK_TEMPLATE_MII_STUDIO,
-    MII_LINK_TEMPLATE_MII_RENDERER_REAL,
-)
+from config import DEBUG_MODE, MIIS_NINTENDO_ACCOUNT, MIIS_MII_STUDIO, MIIS_NINTENDO_NETWORK_ID, MII_DOWNLOAD_FOLDER, MII_SAVE_HD_IMAGES, MII_SAVE_ROTATING_GIFS, MII_SAVE_ROTATING_FRAMES
+
+MII_POSES = ["face", "face_only", "all_body"]  # list of all rendered poses to download
+MII_EXPRESSIONS = [
+    "normal",
+    "smile",
+    "anger",
+    "sorrow",
+    "surprise",
+    "blink",
+    "normal_open_mouth",
+    "smile_open_mouth",
+    "anger_open_mouth",
+    "sorrow_open_mouth",
+    "surprise_open_mouth",
+    "blink_open_mouth",
+    "wink_left",
+    "wink_right",
+    "wink_left_open_mouth",
+    "wink_right_open_mouth",
+    "like_wink_left",
+    "like_wink_right",
+    "frustrated",
+]  # list of all rendered expressions to download
+MII_SHADINGS = ["miitomo", "switch", "wiiu"]  # list of shading types for NNID Miis
+
+MII_LINK_PREFIX_NINTENDO_ACCOUNT = "https://cdn-mii.accounts.nintendo.com/2.0.0/mii_images/{mii_id}.png?width=512"
+MII_LINK_PREFIX_MII_STUDIO = "https://studio.mii.nintendo.com/miis/image.png?data={mii_code}&width=512"
+MII_LINK_PREFIX_MII_RENDERER_REAL = "https://mii-unsecure.ariankordi.net/miis/image.png?{data_or_nnid}={mii_code_or_nnid}&shaderType={shading}&resourceType=very_high&width=1200"
+MII_LINK_SUFFIX_MIIS = "&type={pose}&expression={expression}&bgColor=00000000{frame_count}"
+MII_LINK_TEMPLATE_NINTENDO_ACCOUNT = MII_LINK_PREFIX_NINTENDO_ACCOUNT + MII_LINK_SUFFIX_MIIS
+MII_LINK_TEMPLATE_MII_STUDIO = MII_LINK_PREFIX_MII_STUDIO + MII_LINK_SUFFIX_MIIS
+MII_LINK_TEMPLATE_MII_RENDERER_REAL = MII_LINK_PREFIX_MII_RENDERER_REAL + MII_LINK_SUFFIX_MIIS
 
 
 def download_mii_avatars(progress: Progress) -> None:

@@ -9,16 +9,13 @@ import time
 
 
 from common_downloader_functions import progress_bar, download_url_to_bytes, download_url_to_json, find_next_available_file_path, save_contents_to_file
-from config import (
-    DEBUG_MODE,
-    ROBLOX_USER_IDS,
-    ROBLOX_POSES,
-    ROBLOX_DOWNLOAD_FOLDER,
-    ROBLOX_SAVE_OUTFIT_IMAGES,
-    ROBLOX_LINK_TEMPLATE_AVATAR,
-    ROBLOX_LINK_TEMPLATE_CURRENT_OUTFIT,
-    ROBLOX_LINK_TEMPLATE_OUTFIT,
-)
+from config import DEBUG_MODE, ROBLOX_USER_IDS, ROBLOX_DOWNLOAD_FOLDER, ROBLOX_SAVE_OUTFIT_IMAGES
+
+ROBLOX_POSES = [{"pose": "avatar", "size": "720x720"}, {"pose": "avatar-headshot", "size": "720x720"}, {"pose": "avatar-bust", "size": "420x420"}]
+
+ROBLOX_LINK_TEMPLATE_AVATAR = "https://thumbnails.roblox.com/v1/users/{pose}?userIds={user_id}&size={size}&format=png"
+ROBLOX_LINK_TEMPLATE_CURRENT_OUTFIT = "https://avatar.roblox.com/v1/users/{user_id}/currently-wearing"
+ROBLOX_LINK_TEMPLATE_OUTFIT = "https://thumbnails.roblox.com/v1/assets?assetIds={outfit_id}&size=700x700&format=png"
 
 
 def download_roblox_avatars_and_outfits(progress: Progress) -> None:
