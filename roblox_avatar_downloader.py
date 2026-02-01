@@ -38,6 +38,7 @@ def download_roblox_avatars_and_outfits(progress: Progress) -> None:
         task_downloading_outfits = progress.add_task("[magenta]Downloading Roblox outfits...[/]", total=total_downloads[2])
 
     for user in ROBLOX_USER_IDS:
+        user = _get_missing_user_names_and_ids(user)
         for pose in ROBLOX_POSES:
             _download_roblox_avatars(progress, task_downloading_avatars, user, pose)
     if ROBLOX_SAVE_OUTFIT_IMAGES and all_asset_ids:
@@ -96,6 +97,71 @@ def _calculate_total_downloads(unique_asset_ids: list[str] | None) -> tuple[int,
     total_downloads_roblox_outfits = len(unique_asset_ids) if unique_asset_ids else 0
     total = total_downloads_roblox_avatars + total_downloads_roblox_outfits
     return total, total_downloads_roblox_avatars, total_downloads_roblox_outfits
+
+
+def _fetch_username_from_id(user_id: str) -> str | None:
+    """
+    Helper to fetch a username given a user_id; returns None on failure.
+
+    :param user_id: The Roblox user ID to fetch the username for.
+    :return: The username if found, otherwise `None`.
+    """
+    if not user_id:
+        return None
+    api_url = "https://users.roblox.com/v1/users"
+    body = {"userIds": [user_id], "excludeBannedUsers": True}
+    try:
+        data = download_url_to_json(api_url, body=body)
+        if data and "data" in data and isinstance(data["data"], list) and data["data"]:
+            entry = data["data"][0]
+            return entry.get("name")  # can change to "displayName" if wanted
+    except Exception as error:
+        print(f"[red]Error[/]: Problem fetching username for user ID [blue]{user_id}[/]: {error}")
+    return None
+
+
+def _fetch_userid_from_username(username: str) -> str | None:
+    """
+    Helper to fetch a user_id given a username; returns None on failure.
+
+    :param username: The Roblox username to fetch the user ID for.
+    :return: The user ID if found, otherwise `None`.
+    """
+    if not username:
+        return None
+    api_url = "https://users.roblox.com/v1/usernames/users"
+    body = {"usernames": [username], "excludeBannedUsers": True}
+    try:
+        data = download_url_to_json(api_url, body=body)
+        if data and "data" in data and isinstance(data["data"], list) and data["data"]:
+            entry = data["data"][0]
+            user_id = entry.get("id") or entry.get("Id") or entry.get("userId")
+            if user_id:
+                return str(user_id)
+    except Exception as error:
+        print(f"[red]Error[/]: Problem fetching user ID for username [blue]{username}[/]: {error}")
+    return None
+
+
+def _get_missing_user_names_and_ids(user: dict[str, str]) -> dict[str, str]:
+    """
+    Fetches missing usernames or user IDs for a Roblox user.
+
+    :param user: A dictionary containing user information, including `username` and/or `user_id`.
+    """
+    # Ensure username exists (try to fetch from user_id)
+    if "username" not in user or not user["username"]:
+        username = _fetch_username_from_id(user.get("user_id", ""))
+        if username:
+            user["username"] = username
+
+    # Ensure user_id exists (try to fetch from username)
+    if "user_id" not in user or not user["user_id"]:
+        user_id = _fetch_userid_from_username(user.get("username", ""))
+        if user_id:
+            user["user_id"] = user_id
+
+    return user
 
 
 def _download_roblox_avatars(progress: Progress, task: TaskID, user: dict[str, str], pose: dict[str, str]) -> None:

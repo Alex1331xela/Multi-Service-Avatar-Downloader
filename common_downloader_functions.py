@@ -31,17 +31,18 @@ def progress_bar() -> Progress:
     )
 
 
-def download_url_to_raw(url: str) -> requests.Response | None:
+def download_url_to_raw(url: str, body: dict | None = None) -> requests.Response | None:
     """
     Downloads from the given `URL` and returns the response object. Handles HTTP errors for access denial and rate limiting.
 
     :param url: The URL to download.
+    :param body: An optional dictionary to send as a JSON body with the request.
     :return: The content in bytes as a requests.Response object, or `None` if access is denied (HTTP 403), if rate limited and retry fails (HTTP 429), or for other unhandled HTTP errors.
     """
     max_retries = 5
     retries = 0
     while retries <= max_retries:
-        response = requests.get(url, timeout=10)
+        response = requests.get(url, json=body, timeout=10)
         try:
             response.raise_for_status()
             return response
@@ -71,25 +72,27 @@ def download_url_to_raw(url: str) -> requests.Response | None:
     return None
 
 
-def download_url_to_bytes(url: str) -> bytes | None:
+def download_url_to_bytes(url: str, body: dict | None = None) -> bytes | None:
     """
     Downloads from the given `URL` and returns its content as bytes. Handles HTTP errors for access denial and rate limiting.
 
     :param url: The URL to download.
+    :param body: An optional dictionary to send as a JSON body with the request.
     :return: The content in bytes. Returns `None` if access is denied (HTTP 403).
     """
-    response = download_url_to_raw(url)
+    response = download_url_to_raw(url, body=body)
     return response.content if response else None
 
 
-def download_url_to_json(url: str) -> dict | None:
+def download_url_to_json(url: str, body: dict | None = None) -> dict | None:
     """
     Downloads from the given `URL` and returns its content as JSON. Handles HTTP errors for access denial and rate limiting.
 
     :param url: The URL to download.
+    :param body: An optional dictionary to send as a JSON body with the request.
     :return: The content in JSON format. Returns `None` if access is denied (HTTP 403).
     """
-    response = download_url_to_raw(url)
+    response = download_url_to_raw(url, body=body)
     return response.json() if response else None
 
 
