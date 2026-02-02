@@ -9,7 +9,7 @@ DEBUG_MODE: bool = False  # boolean, set to `True` to enable debug mode (prints 
 
 GTA_CHARACTER_NAMES: list[str] = ["Alex1331xela"]  # list of strings, each string a GTA Online character name
 
-GTA_DOWNLOAD_FOLDER: Path = Path.home() / "Pictures" / "gta_online"  # string or path object, path to the folder to save downloaded GTA Online avatars to
+GTA_DOWNLOAD_FOLDER: str | Path = Path.home() / "Pictures" / "gta_online"  # string or path object, path to the folder to save downloaded GTA Online avatars to
 
 # ===================================================================================================================================================
 # =                                                  Nintendo Mii Avatar Downloader Configuration                                                   =
@@ -27,7 +27,7 @@ MII_SAVE_HD_IMAGES: bool = False  # boolean, whether to save high quality render
 MII_SAVE_ROTATING_GIFS: bool = False  # boolean, whether to save rotating GIFs of the Miis in each pose/expression/shading combination
 MII_SAVE_ROTATING_FRAMES: bool = False  # boolean, whether to save the individual side-by-side rotated frames of the Miis in each pose/expression/shading combination
 
-MII_DOWNLOAD_FOLDER: Path = Path.home() / "Pictures" / "mii"  # string or path object, path to the folder to save downloaded Mii avatars to
+MII_DOWNLOAD_FOLDER: str | Path = Path.home() / "Pictures" / "mii"  # string or path object, path to the folder to save downloaded Mii avatars to
 
 # ===================================================================================================================================================
 # =                                                  Roblox Avatar Downloader Configuration                                                         =
@@ -39,4 +39,4 @@ ROBLOX_USER_IDS: list[dict[str, str]] = [
 
 ROBLOX_SAVE_OUTFIT_IMAGES: bool = False  # boolean, whether to save Roblox outfit images
 
-ROBLOX_DOWNLOAD_FOLDER: Path = Path.home() / "Pictures" / "roblox"  # string or path object, path to the folder to save downloaded Roblox avatars and outfits to
+ROBLOX_DOWNLOAD_FOLDER: str | Path = Path.home() / "Pictures" / "roblox"  # string or path object, path to the folder to save downloaded Roblox avatars and outfits to
