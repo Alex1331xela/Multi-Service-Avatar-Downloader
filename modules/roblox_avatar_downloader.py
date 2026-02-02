@@ -8,7 +8,7 @@ from rich.progress import Progress, TaskID
 import time
 
 
-from common_downloader_functions import create_config_file_if_only_default, progress_bar, download_url_to_bytes, download_url_to_json, find_next_available_file_path, save_contents_to_file
+from modules.common_downloader_functions import create_config_file_if_only_default, progress_bar, download_url_to_bytes, download_url_to_json, find_next_available_file_path, save_contents_to_file
 
 try:
     from config import DEBUG_MODE, ROBLOX_USER_IDS, ROBLOX_DOWNLOAD_FOLDER, ROBLOX_SAVE_OUTFIT_IMAGES

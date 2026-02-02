@@ -6,7 +6,7 @@ from pathlib import Path
 from rich import print
 from rich.progress import Progress, TaskID
 
-from common_downloader_functions import create_config_file_if_only_default, progress_bar, download_url_to_bytes, render_gif_from_frames, find_next_available_file_path, save_contents_to_file
+from modules.common_downloader_functions import create_config_file_if_only_default, progress_bar, download_url_to_bytes, render_gif_from_frames, find_next_available_file_path, save_contents_to_file
 
 try:
     from config import DEBUG_MODE, MIIS, MII_DOWNLOAD_FOLDER, MII_SAVE_HD_IMAGES, MII_SAVE_ROTATING_GIFS, MII_SAVE_ROTATING_FRAMES

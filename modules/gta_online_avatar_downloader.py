@@ -6,7 +6,7 @@ import random
 from rich import print
 from rich.progress import Progress, TaskID
 
-from common_downloader_functions import create_config_file_if_only_default, progress_bar, download_url_to_bytes, file_hash, find_next_available_file_path, save_contents_to_file
+from modules.common_downloader_functions import create_config_file_if_only_default, progress_bar, download_url_to_bytes, file_hash, find_next_available_file_path, save_contents_to_file
 
 try:
     from config import DEBUG_MODE, GTA_CHARACTER_NAMES, GTA_DOWNLOAD_FOLDER

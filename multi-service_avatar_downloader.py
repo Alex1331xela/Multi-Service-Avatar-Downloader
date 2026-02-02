@@ -2,10 +2,10 @@ import sys
 
 sys.dont_write_bytecode = True
 
-from gta_online_avatar_downloader import download_gta_avatars
-from mii_downloader import download_mii_avatars
-from roblox_avatar_downloader import download_roblox_avatars_and_outfits
-from common_downloader_functions import create_config_file_if_only_default, progress_bar
+from modules.gta_online_avatar_downloader import download_gta_avatars
+from modules.mii_downloader import download_mii_avatars
+from modules.roblox_avatar_downloader import download_roblox_avatars_and_outfits
+from modules.common_downloader_functions import create_config_file_if_only_default, progress_bar
 
 try:
     from config import GTA_CHARACTER_NAMES, MIIS, ROBLOX_USER_IDS
