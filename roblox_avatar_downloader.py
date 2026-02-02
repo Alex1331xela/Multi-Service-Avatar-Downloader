@@ -8,7 +8,7 @@ from rich.progress import Progress, TaskID
 import time
 
 
-from common_downloader_functions import progress_bar, download_url_to_bytes, download_url_to_json, find_next_available_file_path, save_contents_to_file
+from common_downloader_functions import create_config_file_if_only_default, progress_bar, download_url_to_bytes, download_url_to_json, find_next_available_file_path, save_contents_to_file
 
 try:
     from config import DEBUG_MODE, ROBLOX_USER_IDS, ROBLOX_DOWNLOAD_FOLDER, ROBLOX_SAVE_OUTFIT_IMAGES
@@ -246,5 +246,6 @@ def _download_roblox_outfits(progress: Progress, task: TaskID, outfit_id: str) -
 
 
 if __name__ == "__main__":
+    create_config_file_if_only_default()
     with progress_bar() as progress:
         download_roblox_avatars_and_outfits(progress)

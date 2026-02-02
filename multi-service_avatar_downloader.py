@@ -5,7 +5,7 @@ sys.dont_write_bytecode = True
 from gta_online_avatar_downloader import download_gta_avatars
 from mii_downloader import download_mii_avatars
 from roblox_avatar_downloader import download_roblox_avatars_and_outfits
-from common_downloader_functions import progress_bar
+from common_downloader_functions import create_config_file_if_only_default, progress_bar
 
 try:
     from config import GTA_CHARACTER_NAMES, MIIS, ROBLOX_USER_IDS
@@ -13,6 +13,7 @@ except ImportError:
     from config_default import GTA_CHARACTER_NAMES, MIIS, ROBLOX_USER_IDS
 
 if __name__ == "__main__":
+    create_config_file_if_only_default()
     with progress_bar() as progress:
         if GTA_CHARACTER_NAMES is not None:
             download_gta_avatars(progress)

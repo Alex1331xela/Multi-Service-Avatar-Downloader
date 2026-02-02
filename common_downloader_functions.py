@@ -16,6 +16,23 @@ except ImportError:
     from config_default import DEBUG_MODE
 
 
+def create_config_file_if_only_default() -> None:
+    """
+    Manages the configuration file. If `config.py` does not exist, creates it by copying from `config_default.py`.
+    """
+    config_file_path = Path(__file__).parent / "config.py"
+    default_config_file_path = Path(__file__).parent / "config_default.py"
+
+    if not config_file_path.exists():
+        with open(default_config_file_path, "r", encoding="utf-8") as default_config_file:
+            default_config_content = default_config_file.read()
+        with open(config_file_path, "w", encoding="utf-8") as config_file:
+            config_file.write(default_config_content)
+        print("[green]Created[/]: Configuration file 'config.py' created from default template.")
+    elif DEBUG_MODE:
+        print("[blue]Exists[/]: Configuration file 'config.py' already exists.")
+
+
 def progress_bar() -> Progress:
     """
     Returns a `Progress` class with customized arguments for use in a progress bar.
