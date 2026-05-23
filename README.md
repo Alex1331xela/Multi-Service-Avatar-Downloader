@@ -3,6 +3,8 @@ A downloader written in Python that downloads avatars from multiple different se
 > Project started: October 12th, 2021.
 
 ### Currently supported services/platforms:
+- GeoGuessr
+    - using a GeoGuessr user ID
 - Grand Theft Auto Online
     - using a GTA Online username
 - Nintendo Miis
