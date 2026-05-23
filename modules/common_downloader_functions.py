@@ -20,8 +20,8 @@ def create_config_file_if_only_default() -> None:
     """
     Manages the configuration file. If `config.py` does not exist, creates it by copying from `config_default.py`.
     """
-    config_file_path = Path(__file__).parent / "config.py"
-    default_config_file_path = Path(__file__).parent / "config_default.py"
+    config_file_path = Path(__file__).parent.parent / "config.py"
+    default_config_file_path = Path(__file__).parent.parent / "config_default.py"
 
     if not config_file_path.exists():
         with open(default_config_file_path, "r", encoding="utf-8") as default_config_file:
