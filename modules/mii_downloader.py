@@ -2,9 +2,15 @@ import sys
 
 sys.dont_write_bytecode = True
 
+import os
 from pathlib import Path
 from rich import print
 from rich.progress import Progress, TaskID
+
+# ensure project root is on sys.path so sibling 'modules' imports resolve when running this file directly
+project_root = os.path.dirname(os.path.dirname(__file__))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
 from modules.common_downloader_functions import create_config_file_if_only_default, progress_bar, download_url_to_bytes, render_gif_from_frames, find_next_available_file_path, save_contents_to_file
 
