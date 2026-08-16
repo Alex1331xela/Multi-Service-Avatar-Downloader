@@ -124,7 +124,7 @@ def _process_individual_image(progress: Progress, task: TaskID, mii: dict[str, s
         file_name = _generate_filename(mii, pose, expression, shading, "png")
         output_dir = Path(MII_DOWNLOAD_FOLDER) / mii["mii_name"]
         output_dir = output_dir / (str(frames) + " frames") if frames != 1 else output_dir
-        file_path = find_next_available_file_path(output_dir, file_name, image_content)
+        file_path = find_next_available_file_path(output_dir, file_name, image_content, size_only = True)
         if file_path:
             save_contents_to_file(file_path, image_content)
         progress.update(task, advance=1)
@@ -133,7 +133,7 @@ def _process_individual_image(progress: Progress, task: TaskID, mii: dict[str, s
         file_name = _generate_filename(mii, pose, expression, shading, "gif")
         output_dir = Path(MII_DOWNLOAD_FOLDER) / mii["mii_name"]
         gif_bytes = render_gif_from_frames(image_content, frames)
-        file_path = find_next_available_file_path(output_dir, file_name, gif_bytes)
+        file_path = find_next_available_file_path(output_dir, file_name, gif_bytes, size_only = True)
         if file_path:
             save_contents_to_file(file_path, gif_bytes)
         progress.update(task, advance=1)
