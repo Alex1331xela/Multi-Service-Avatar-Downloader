@@ -185,10 +185,10 @@ def file_hash(file: str | Path | bytes) -> str:
     :return: The `MD5` hash as a hexadecimal string.
     """
     if isinstance(file, (bytes, bytearray)):
-        return hashlib.md5(file).hexdigest()
+        return hashlib.md5(file, usedforsecurity=False).hexdigest()
 
     with open(file, "rb") as f:
-        hash_md5 = hashlib.md5(f.read()).hexdigest()
+        hash_md5 = hashlib.md5(f.read(), usedforsecurity=False).hexdigest()
     return hash_md5
 
 
