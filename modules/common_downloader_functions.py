@@ -188,12 +188,37 @@ def file_hash(file: str | Path | bytes) -> str:
         return hashlib.md5(file).hexdigest()
 
     with open(file, "rb") as f:
-        for chunk in iter(lambda: f.read(4096), b""):
-            hashlib.md5().update(chunk)
-    return hashlib.md5().hexdigest()
+        hash_md5 = hashlib.md5(f.read()).hexdigest()
+    return hash_md5
 
 
-def is_identical_file(file_1: str | Path | bytes, file_2: str | Path | bytes, size_only: bool = False) -> bool:
+def file_size(file: str | Path | bytes) -> int:
+    """
+    Calculates the size of a file or raw bytes.
+
+    :param file: The path to the file or bytes content.
+    :return: The size in bytes.
+    """
+    if isinstance(file, (str, Path)):
+        return os.path.getsize(file)
+    
+    if isinstance(file, (bytes, bytearray)):
+        return len(file)
+
+
+def _file_exists(file: str | Path | bytes) -> bool:
+    """
+    Checks if a file path exists.
+
+    :param file: The file path or content in bytes.
+    :return: `True` if it exists or is bytes, `False` otherwise.
+    """
+    if isinstance(file, (str, Path)) and not os.path.exists(file):
+        return False
+    return True
+
+
+def _is_identical_file(file_1: str | Path | bytes, file_2: str | Path | bytes, size_only: bool = False) -> bool:
     """
     Checks if two files are identical.
 
@@ -202,50 +227,25 @@ def is_identical_file(file_1: str | Path | bytes, file_2: str | Path | bytes, si
     :param size_only: If `True`, only compare file sizes. If `False`, compare file hashes.
     :return: `True` if the files are identical based on the specified comparison method, `False` otherwise
     """
-    if (isinstance(file_1, (str, Path)) and not os.path.exists(file_1)) or (isinstance(file_2, (str, Path)) and not os.path.exists(file_2)):
+    if not _file_exists(file_1) or not _file_exists(file_2):
         return False
 
-    if isinstance(file_1, (str, Path)):
-        file_1_size = os.path.getsize(file_1)
-        file_1_hash = file_hash(file_1)
+    if file_size(file_1) != file_size(file_2):
+        return False
+
+    if file_hash(file_1) == file_hash(file_2):
+        if DEBUG_MODE:
+            print(f"Skipped ([green]identical[/]): {file_1}")
+        return True
+    elif size_only:
+        if DEBUG_MODE:
+            print(f"Skipped ([yellow]different[/]): {file_1}")
+        return True
     else:
-        file_1_size = len(file_1)
-        file_1_hash = hashlib.md5(file_1).hexdigest()
-
-    if isinstance(file_2, (str, Path)):
-        file_2_size = os.path.getsize(file_2)
-        file_2_hash = file_hash(file_2)
-    else:
-        file_2_size = len(file_2)
-        file_2_hash = hashlib.md5(file_2).hexdigest()
-
-    if size_only:
-        return file_1_size == file_2_size
-    else:
-        return file_1_hash == file_2_hash
+        return False
 
 
-def identical_or_same_size_file(file_1: str | Path | bytes, file_2: str | Path | bytes) -> bool:
-    """
-    Checks if one file is either identical to another or has the same size.
-
-    :param file_1: The first file path or content in bytes.
-    :param file_2: The second file path or content in bytes.
-    :return: `True` if the file is identical or has the same size, `False` otherwise.
-    """
-    if is_identical_file(file_1, file_2, size_only=True):
-        if is_identical_file(file_1, file_2):
-            if DEBUG_MODE:
-                print(f"Skipped ([green]identical[/]): {file_1}")
-            return True
-        else:
-            if DEBUG_MODE:
-                print(f"Skipped ([yellow]different[/]): {file_1}")
-            return True
-    return False
-
-
-def find_next_available_file_path(folder_path: str | Path, file_name: str, file_content: bytes, suffix_on_original_file_and_take_its_spot: bool = False) -> Path | None:
+def find_next_available_file_path(folder_path: str | Path, file_name: str, file_content: bytes, suffix_on_original_file_and_take_its_spot: bool = False, size_only: bool = False) -> Path | None:
     """
     Finds an available file path, avoiding overwriting identical files.
 
@@ -253,6 +253,7 @@ def find_next_available_file_path(folder_path: str | Path, file_name: str, file_
     :param file_name: The desired file name with extension.
     :param file_content: The content of the file in bytes.
     :param suffix_on_original_file_and_take_its_spot: If `True`, renames the existing file and takes its spot. If `False`, finds a new available name.
+    :param size_only: If `True`, only compare file sizes. If `False`, compare file hashes.
     :return: The available file path as a Path object, or `None` if an identical file already exists.
     """
 
@@ -263,7 +264,7 @@ def find_next_available_file_path(folder_path: str | Path, file_name: str, file_
     os.makedirs(folder_path, exist_ok=True)
     if not file_path.exists():
         return file_path
-    if identical_or_same_size_file(file_path, file_content):
+    if _is_identical_file(file_path, file_content, size_only=size_only):
         return None
 
     file_name_base, file_name_extension = os.path.splitext(file_name)
@@ -277,7 +278,7 @@ def find_next_available_file_path(folder_path: str | Path, file_name: str, file_
             else:
                 os.rename(file_path, new_file_path)
                 return file_path
-        if identical_or_same_size_file(new_file_path, file_content):
+        if _is_identical_file(new_file_path, file_content, size_only=size_only):
             return None
         suffix += 1
 
