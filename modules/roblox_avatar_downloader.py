@@ -25,6 +25,7 @@ ROBLOX_POSES = [{"pose": "avatar", "size": "720x720"}, {"pose": "avatar-headshot
 ROBLOX_LINK_TEMPLATE_AVATAR = "https://thumbnails.roblox.com/v1/users/{pose}?userIds={user_id}&size={size}&format=png"
 ROBLOX_LINK_TEMPLATE_CURRENT_OUTFIT = "https://avatar.roblox.com/v1/users/{user_id}/currently-wearing"
 ROBLOX_LINK_TEMPLATE_OUTFIT = "https://thumbnails.roblox.com/v1/assets?assetIds={outfit_id}&size=700x700&format=png"
+IGNORE_FILE_HASHES_AND_COMPARE_SIZE_ONLY = True  # boolean, whether to ignore file hashes and only compare file sizes when checking for duplicate images
 
 
 def download_roblox_avatars_and_outfits(progress: Progress) -> None:
@@ -192,7 +193,7 @@ def _download_roblox_avatars(progress: Progress, task: TaskID, user: dict[str, s
         return
 
     file_name = f"roblox_{user['username']}_{pose['pose']}.png"
-    file_path = find_next_available_file_path(ROBLOX_DOWNLOAD_FOLDER, file_name, image_content, size_only=True)
+    file_path = find_next_available_file_path(ROBLOX_DOWNLOAD_FOLDER, file_name, image_content, size_only=IGNORE_FILE_HASHES_AND_COMPARE_SIZE_ONLY)
     if file_path:
         save_contents_to_file(file_path, image_content)
     progress.update(task, advance=1)
@@ -244,7 +245,7 @@ def _download_roblox_outfits(progress: Progress, task: TaskID, outfit_id: str) -
 
     file_name = f"roblox_outfit_{outfit_type}_{outfit_id}.png"
     folder_path = Path(ROBLOX_DOWNLOAD_FOLDER, "outfits")
-    file_path = find_next_available_file_path(folder_path, file_name, image_content, size_only=True)
+    file_path = find_next_available_file_path(folder_path, file_name, image_content, size_only=IGNORE_FILE_HASHES_AND_COMPARE_SIZE_ONLY)
     if file_path:
         save_contents_to_file(file_path, image_content)
     progress.update(task, advance=1)

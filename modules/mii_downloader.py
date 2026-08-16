@@ -50,6 +50,7 @@ MII_LINK_SUFFIX_MIIS = "&type={pose}&expression={expression}&bgColor=00000000{fr
 MII_LINK_TEMPLATE_NINTENDO_ACCOUNT = MII_LINK_PREFIX_NINTENDO_ACCOUNT + MII_LINK_SUFFIX_MIIS
 MII_LINK_TEMPLATE_MII_STUDIO = MII_LINK_PREFIX_MII_STUDIO + MII_LINK_SUFFIX_MIIS
 MII_LINK_TEMPLATE_MII_RENDERER_REAL = MII_LINK_PREFIX_MII_RENDERER_REAL + MII_LINK_SUFFIX_MIIS
+IGNORE_FILE_HASHES_AND_COMPARE_SIZE_ONLY = True  # boolean, whether to ignore file hashes and only compare file sizes when checking for duplicate images
 
 
 def download_mii_avatars(progress: Progress) -> None:
@@ -124,7 +125,7 @@ def _process_individual_image(progress: Progress, task: TaskID, mii: dict[str, s
         file_name = _generate_filename(mii, pose, expression, shading, "png")
         output_dir = Path(MII_DOWNLOAD_FOLDER) / mii["mii_name"]
         output_dir = output_dir / (str(frames) + " frames") if frames != 1 else output_dir
-        file_path = find_next_available_file_path(output_dir, file_name, image_content, size_only = True)
+        file_path = find_next_available_file_path(output_dir, file_name, image_content, size_only = IGNORE_FILE_HASHES_AND_COMPARE_SIZE_ONLY)
         if file_path:
             save_contents_to_file(file_path, image_content)
         progress.update(task, advance=1)
@@ -133,7 +134,7 @@ def _process_individual_image(progress: Progress, task: TaskID, mii: dict[str, s
         file_name = _generate_filename(mii, pose, expression, shading, "gif")
         output_dir = Path(MII_DOWNLOAD_FOLDER) / mii["mii_name"]
         gif_bytes = render_gif_from_frames(image_content, frames)
-        file_path = find_next_available_file_path(output_dir, file_name, gif_bytes, size_only = True)
+        file_path = find_next_available_file_path(output_dir, file_name, gif_bytes, size_only = IGNORE_FILE_HASHES_AND_COMPARE_SIZE_ONLY)
         if file_path:
             save_contents_to_file(file_path, gif_bytes)
         progress.update(task, advance=1)

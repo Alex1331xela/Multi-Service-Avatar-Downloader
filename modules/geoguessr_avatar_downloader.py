@@ -30,6 +30,7 @@ GEOGUESSR_AVATAR_POSES = ["fullBodyPath", "mugshotPath", "pinImageId"]
 
 GEOGUESSR_USER_DATA_LINK_TEMPLATE = "https://www.geoguessr.com/api/v4/player-identities/{player_id}"
 GEOGUESSR_IMAGE_LINK_TEMPLATE = "https://www.geoguessr.com/images/resize:auto:2048:2048/gravity:ce/plain/{image_id}"
+IGNORE_FILE_HASHES_AND_COMPARE_SIZE_ONLY = False  # boolean, whether to ignore file hashes and only compare file sizes when checking for duplicate images
 
 saved_hashes = set()  # to avoid saving duplicate images for different poses of the same avatar
 
@@ -78,7 +79,7 @@ def _download_character_avatar(progress: Progress, task: TaskID, avatar: dict[st
     saved_hashes.add(file_hash(image_content))
 
     file_name = f"geoguessr_{nick}_{pose}.png"
-    file_path = find_next_available_file_path(GEOGUESSR_DOWNLOAD_FOLDER, file_name, image_content)
+    file_path = find_next_available_file_path(GEOGUESSR_DOWNLOAD_FOLDER, file_name, image_content, size_only=IGNORE_FILE_HASHES_AND_COMPARE_SIZE_ONLY)
     if file_path:
         save_contents_to_file(file_path, image_content)
     progress.update(task, advance=1)

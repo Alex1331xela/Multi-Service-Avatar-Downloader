@@ -20,6 +20,7 @@ except ImportError:
     from config_default import DEBUG_MODE, GTA_CHARACTER_NAMES, GTA_DOWNLOAD_FOLDER
 
 GTA_LINK_TEMPLATE = "https://prod.cloud.rockstargames.com/members/np/{random_four_digits}/{character_name}/publish/gta5/mpchars/0_ps4.png"
+IGNORE_FILE_HASHES_AND_COMPARE_SIZE_ONLY = False  # boolean, whether to ignore file hashes and only compare file sizes when checking for duplicate images
 
 
 def download_gta_avatars(progress: Progress) -> None:
@@ -48,7 +49,7 @@ def _download_character_avatar(progress: Progress, task: TaskID, character_name:
         return
 
     file_name = f"gta_online_{character_name}.png"
-    file_path = find_next_available_file_path(GTA_DOWNLOAD_FOLDER, file_name, image_content)
+    file_path = find_next_available_file_path(GTA_DOWNLOAD_FOLDER, file_name, image_content, size_only=IGNORE_FILE_HASHES_AND_COMPARE_SIZE_ONLY)
     if file_path:
         save_contents_to_file(file_path, image_content)
     progress.update(task, advance=1)
