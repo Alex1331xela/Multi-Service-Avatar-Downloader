@@ -3,7 +3,7 @@ import sys
 sys.dont_write_bytecode = True
 
 import os
-import random
+import secrets
 from rich import print
 from rich.progress import Progress, TaskID
 
@@ -32,7 +32,7 @@ def download_gta_avatars(progress: Progress) -> None:
 
 
 def _download_character_avatar(progress: Progress, task: TaskID, character_name: str) -> None:
-    random_seed = f"{random.randint(0, 9999):04d}"
+    random_seed = f"{secrets.randbelow(10000):04d}"
     url = GTA_LINK_TEMPLATE.format(random_four_digits=random_seed, character_name=character_name)
     if DEBUG_MODE:
         print(f"[blue]Loading[/]: {url}")
